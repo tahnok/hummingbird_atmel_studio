@@ -21,9 +21,17 @@ extern "C" {
 #include <hal_io.h>
 #include <hal_sleep.h>
 
+#include <hal_adc_sync.h>
+
 #include <hal_delay.h>
 
 #include "hal_usb_device.h"
+
+extern struct adc_sync_descriptor ADC_0;
+
+void ADC_0_PORT_init(void);
+void ADC_0_CLOCK_init(void);
+void ADC_0_init(void);
 
 void delay_driver_init(void);
 

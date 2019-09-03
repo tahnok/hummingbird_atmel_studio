@@ -10,6 +10,20 @@
 #include "driver_init.h"
 #include "utils.h"
 
+/**
+ * Example of using ADC_0 to generate waveform.
+ */
+void ADC_0_example(void)
+{
+	uint8_t buffer[2];
+
+	adc_sync_enable_channel(&ADC_0, 0);
+
+	while (1) {
+		adc_sync_read_channel(&ADC_0, 0, buffer, 2);
+	}
+}
+
 void delay_example(void)
 {
 	delay_ms(5000);

@@ -1,9 +1,9 @@
 /**
  * \file
  *
- * \brief Application implement
+ * \brief ADC related functionality declaration.
  *
- * Copyright (c) 2015-2018 Microchip Technology Inc. and its subsidiaries.
+ * Copyright (c) 2016-2018 Microchip Technology Inc. and its subsidiaries.
  *
  * \asf_license_start
  *
@@ -15,7 +15,7 @@
  * to your use of third party software (including open source software) that
  * may accompany Microchip software.
  *
- * THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS".  NO WARRANTIES,
+ * THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS". NO WARRANTIES,
  * WHETHER EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE,
  * INCLUDING ANY IMPLIED WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY,
  * AND FITNESS FOR A PARTICULAR PURPOSE. IN NO EVENT WILL MICROCHIP BE
@@ -30,34 +30,43 @@
  * \asf_license_stop
  *
  */
-/*
- * Support and FAQ: visit <a href="https://www.microchip.com/support/">Microchip
- * Support</a>
+
+#ifndef _HPL_ADC_ADC_H_INCLUDED
+#define _HPL_ADC_ADC_H_INCLUDED
+
+#include <hpl_adc_sync.h>
+#include <hpl_adc_async.h>
+
+/**
+ * \addtogroup HPL ADC
+ *
+ * \section hpl_adc_rev Revision History
+ * - v1.0.0 Initial Release
+ *
+ *@{
  */
 
-#include "atmel_start.h"
-#include "atmel_start_pins.h"
-#include <stdio.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-int main(void) {
-  atmel_start_init();
-  wait_for_cdc_ready();
-  uint16_t raw_battery_voltage;
-  
+/**
+ * \name HPL functions
+ */
+//@{
 
-  adc_sync_enable_channel(&ADC_0, 0);
-  while (1) {
-    delay_ms(1000);
-    gpio_toggle_pin_level(LED);
+/**
+ * \brief Retrieve ADC helper functions
+ *
+ * \return A pointer to set of ADC helper functions
+ */
+void *_adc_get_adc_sync(void);
+void *_adc_get_adc_async(void);
 
-    adc_sync_read_channel(&ADC_0, 0, ((uint8_t *) &raw_battery_voltage), 2);
-	float battery_voltage = (float) raw_battery_voltage;
-	 battery_voltage *= 2;    // we divided by 2, so multiply back
-	 battery_voltage *= 3.3;  // Multiply by 3.3V, our reference voltage
-	 battery_voltage /= 4096; // convert to voltage
-    char buffer[120];
-    sprintf(buffer, "ADC value is %d converted to %.6f also %.6f\n", raw_battery_voltage, battery_voltage, 3.3F);
-    cdcdf_acm_write((uint8_t *)buffer, strlen(buffer));
-  }
+//@}
+
+#ifdef __cplusplus
 }
-
+#endif
+/**@}*/
+#endif /* _HPL_USART_UART_H_INCLUDED */
