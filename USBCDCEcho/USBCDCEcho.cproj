@@ -127,9 +127,9 @@
           <AcmeProjectActionInfo Action="File" Source="usb/usb_protocol.c" IsConfig="false" Hash="506QsMNqKwMw3St/nEXa8Q" />
           <AcmeProjectActionInfo Action="File" Source="usb/usb_protocol.h" IsConfig="false" Hash="IjsDWsLIdSQj3pFlkAX0UA" />
           <AcmeProjectActionInfo Action="File" Source="usb_cdc_echo_main.c" IsConfig="false" Hash="tuPJ1OAmMRQKr5kHMTuGrQ" />
-          <AcmeProjectActionInfo Action="File" Source="driver_init.c" IsConfig="false" Hash="WO+2hQLv7I4ZvOm5hnjwWA" />
+          <AcmeProjectActionInfo Action="File" Source="driver_init.c" IsConfig="false" Hash="RW9h5bNNZ0TKL53tdnXirg" />
           <AcmeProjectActionInfo Action="File" Source="driver_init.h" IsConfig="false" Hash="xF2S0OTVgV2O6It+vHvZ1A" />
-          <AcmeProjectActionInfo Action="File" Source="atmel_start_pins.h" IsConfig="false" Hash="ZlGWUMEBQVPTCjk+jeTegw" />
+          <AcmeProjectActionInfo Action="File" Source="atmel_start_pins.h" IsConfig="false" Hash="W/MeFHyw4vi00S+rTiNeLw" />
           <AcmeProjectActionInfo Action="File" Source="examples/driver_examples.h" IsConfig="false" Hash="Y9YwJ+JgEeTQYiZeaDgXIA" />
           <AcmeProjectActionInfo Action="File" Source="examples/driver_examples.c" IsConfig="false" Hash="/nslKtqTOJB5ajnDjiDRmg" />
           <AcmeProjectActionInfo Action="File" Source="hal/include/hal_adc_sync.h" IsConfig="false" Hash="ez1X5T9kpYwT+1+5x4Pxqg" />
@@ -157,7 +157,7 @@
           <AcmeProjectActionInfo Action="File" Source="usb_start.h" IsConfig="false" Hash="tIiPIYvUpZZo7de2aDnOew" />
           <AcmeProjectActionInfo Action="File" Source="atmel_start.h" IsConfig="false" Hash="RMqb5tXF0KJJUa8pwHEMHQ" />
           <AcmeProjectActionInfo Action="File" Source="atmel_start.c" IsConfig="false" Hash="cPHebvG8xgdrV+XTYs6EeA" />
-          <AcmeProjectActionInfo Action="File" Source="config/hpl_adc_config.h" IsConfig="true" Hash="/6MLoBwn8X874sJYM+NyhA" />
+          <AcmeProjectActionInfo Action="File" Source="config/hpl_adc_config.h" IsConfig="true" Hash="WFgyOCE1nto3s6uCh0BK4w" />
           <AcmeProjectActionInfo Action="File" Source="config/hpl_dmac_config.h" IsConfig="true" Hash="epQJaS6fYVwOO2L9+1CkQg" />
           <AcmeProjectActionInfo Action="File" Source="config/hpl_gclk_config.h" IsConfig="true" Hash="6szcjzfFuG9p6HYwM0ypZg" />
           <AcmeProjectActionInfo Action="File" Source="config/hpl_pm_config.h" IsConfig="true" Hash="GH0DautnKY3X7yLEFG4tgA" />
@@ -170,7 +170,23 @@
         <NonsecureFilesInfo />
       </AcmeProjectConfig>
     </AcmeProjectConfig>
-    <avrtool />
+    <avrtool>com.atmel.avrdbg.tool.samice</avrtool>
+    <avrtoolserialnumber>801012879</avrtoolserialnumber>
+    <avrdeviceexpectedsignature>0x10010305</avrdeviceexpectedsignature>
+    <avrtoolinterface>SWD</avrtoolinterface>
+    <com_atmel_avrdbg_tool_samice>
+      <ToolOptions>
+        <InterfaceProperties>
+          <SwdClock>4000000</SwdClock>
+        </InterfaceProperties>
+        <InterfaceName>SWD</InterfaceName>
+        <JlinkConfigFile>C:\Users\Wesley\Documents\Atmel Studio\7.0\USBCDCEcho\USBCDCEcho\jlink.config</JlinkConfigFile>
+      </ToolOptions>
+      <ToolType>com.atmel.avrdbg.tool.samice</ToolType>
+      <ToolNumber>801012879</ToolNumber>
+      <ToolName>J-Link</ToolName>
+    </com_atmel_avrdbg_tool_samice>
+    <avrtoolinterfaceclock>4000000</avrtoolinterfaceclock>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <ToolchainSettings>
@@ -321,6 +337,7 @@
   <armgcc.compiler.optimization.PrepareFunctionsForGarbageCollection>True</armgcc.compiler.optimization.PrepareFunctionsForGarbageCollection>
   <armgcc.compiler.optimization.DebugLevel>Maximum (-g3)</armgcc.compiler.optimization.DebugLevel>
   <armgcc.compiler.warnings.AllWarnings>True</armgcc.compiler.warnings.AllWarnings>
+  <armgcc.linker.general.UseNewlibNano>True</armgcc.linker.general.UseNewlibNano>
   <armgcc.linker.libraries.Libraries>
     <ListValues>
       <Value>libm</Value>
@@ -333,7 +350,7 @@
   </armgcc.linker.libraries.LibrarySearchPaths>
   <armgcc.linker.optimization.GarbageCollectUnusedSections>True</armgcc.linker.optimization.GarbageCollectUnusedSections>
   <armgcc.linker.memorysettings.ExternalRAM />
-  <armgcc.linker.miscellaneous.LinkerFlags>-Tsamd21g18a_flash.ld -Wl,--section-start=.text=0x2000</armgcc.linker.miscellaneous.LinkerFlags>
+  <armgcc.linker.miscellaneous.LinkerFlags>-Tsamd21g18a_flash.ld</armgcc.linker.miscellaneous.LinkerFlags>
   <armgcc.assembler.general.IncludePaths>
     <ListValues>
       <Value>%24(PackRepoDir)\ARM\CMSIS\5.4.0\CMSIS\Core\Include\</Value>

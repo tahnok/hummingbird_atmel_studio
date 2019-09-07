@@ -30,7 +30,7 @@
 // <i> Select the reference for the ADC (REFSEL)
 // <id> adc_reference
 #ifndef CONF_ADC_0_REFSEL
-#define CONF_ADC_0_REFSEL 0x0
+#define CONF_ADC_0_REFSEL 0x2
 #endif
 
 // <o> Prescaler configuration
@@ -116,7 +116,7 @@
 // <e> Advanced Configuration
 // <id> adc_advanced_settings
 #ifndef CONF_ADC_0_ADVANCED_CONFIG
-#define CONF_ADC_0_ADVANCED_CONFIG 0
+#define CONF_ADC_0_ADVANCED_CONFIG 1
 #endif
 
 // <q> Run in standby
@@ -178,7 +178,7 @@
 // <i> These bits set the gain factor of the ADC gain stage. (GAIN)
 // <id> adc_arch_gain
 #ifndef CONF_ADC_0_GAIN
-#define CONF_ADC_0_GAIN 0x0
+#define CONF_ADC_0_GAIN 0xf
 #endif
 
 // <o> Adjusting Result / Division Coefficient <0-7>

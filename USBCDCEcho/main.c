@@ -41,22 +41,28 @@
 
 int main(void) {
   atmel_start_init();
+  //while (1) {
+  // delay_ms(1000);
+  //  gpio_toggle_pin_level(LED2);
+  //}
   wait_for_cdc_ready();
   uint16_t raw_battery_voltage;
-  
 
   adc_sync_enable_channel(&ADC_0, 0);
   while (1) {
     delay_ms(1000);
-    gpio_toggle_pin_level(LED);
+    gpio_toggle_pin_level(LED2);
 
-    adc_sync_read_channel(&ADC_0, 0, ((uint8_t *) &raw_battery_voltage), 2);
-	float battery_voltage = (float) raw_battery_voltage;
-	 battery_voltage *= 2;    // we divided by 2, so multiply back
-	 battery_voltage *= 3.3;  // Multiply by 3.3V, our reference voltage
-	 battery_voltage /= 4096; // convert to voltage
+    adc_sync_read_channel(&ADC_0, 0, ((uint8_t *)&raw_battery_voltage), 2);
+    adc_sync_read_channel(&ADC_0, 0, ((uint8_t *)&raw_battery_voltage), 2);
+
+    float battery_voltage = (float)raw_battery_voltage;
+    battery_voltage *= 2;    // we divided by 2, so multiply back
+    battery_voltage *= 3.3;  // Multiply by 3.3V, our reference voltage
+    battery_voltage /= 4096; // convert to voltage
     char buffer[120];
-    sprintf(buffer, "ADC value is %d converted to %.6f also %.6f\n", raw_battery_voltage, battery_voltage, 3.3F);
+    sprintf(buffer, "ADC value is %d converted to %.6f also %.6f\n",
+            raw_battery_voltage, battery_voltage, 3.3F);
     cdcdf_acm_write((uint8_t *)buffer, strlen(buffer));
   }
 }

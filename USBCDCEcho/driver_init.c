@@ -165,6 +165,20 @@ void system_init(void)
 
 	gpio_set_pin_function(LED, GPIO_PIN_FUNCTION_OFF);
 
+	// GPIO on PA27
+
+	gpio_set_pin_level(LED2,
+	                   // <y> Initial level
+	                   // <id> pad_initial_level
+	                   // <false"> Low
+	                   // <true"> High
+	                   false);
+
+	// Set pin direction to output
+	gpio_set_pin_direction(LED2, GPIO_DIRECTION_OUT);
+
+	gpio_set_pin_function(LED2, GPIO_PIN_FUNCTION_OFF);
+
 	ADC_0_init();
 
 	delay_driver_init();
