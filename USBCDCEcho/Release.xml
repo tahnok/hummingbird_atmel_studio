@@ -23,6 +23,7 @@
       <Value>../hpl/gclk</Value>
       <Value>../hpl/pm</Value>
       <Value>../hpl/port</Value>
+      <Value>../hpl/sercom</Value>
       <Value>../hpl/sysctrl</Value>
       <Value>../hpl/systick</Value>
       <Value>../hpl/usb</Value>
@@ -64,6 +65,7 @@
       <Value>../hpl/gclk</Value>
       <Value>../hpl/pm</Value>
       <Value>../hpl/port</Value>
+      <Value>../hpl/sercom</Value>
       <Value>../hpl/sysctrl</Value>
       <Value>../hpl/systick</Value>
       <Value>../hpl/usb</Value>
@@ -89,6 +91,7 @@
       <Value>../hpl/gclk</Value>
       <Value>../hpl/pm</Value>
       <Value>../hpl/port</Value>
+      <Value>../hpl/sercom</Value>
       <Value>../hpl/sysctrl</Value>
       <Value>../hpl/systick</Value>
       <Value>../hpl/usb</Value>

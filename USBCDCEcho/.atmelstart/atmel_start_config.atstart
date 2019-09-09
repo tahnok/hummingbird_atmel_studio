@@ -121,13 +121,13 @@ drivers:
       adc_reference: 1/2 VDDANA (only for VDDANA > 2.0V)
       adc_resolution: 12-bit
     optional_signals:
-    - identifier: ADC_0:AIN/7
-      pad: PA07
+    - identifier: ADC_0:AIN/4
+      pad: PA04
       mode: Enabled
       configuration: null
-      definition: Atmel:SAMD21_Drivers:0.0.1::SAMD21J18A-AU::optional_signal_definition::ADC.AIN.7
-      name: ADC/AIN/7
-      label: AIN/7
+      definition: Atmel:SAMD21_Drivers:0.0.1::SAMD21J18A-AU::optional_signal_definition::ADC.AIN.4
+      name: ADC/AIN/4
+      label: AIN/4
     variant: null
     clocks:
       domain_group:
@@ -243,6 +243,50 @@ drivers:
           external: false
           external_frequency: 0
         configuration: {}
+  SPI_0:
+    user_label: SPI_0
+    definition: Atmel:SAMD21_Drivers:0.0.1::SAMD21J18A-AU::SERCOM1::driver_config_definition::SPI.Master::HAL:Driver:SPI.Master.Sync
+    functionality: SPI
+    api: HAL:Driver:SPI_Master_Sync
+    configuration:
+      spi_master_advanced: false
+      spi_master_arch_cpha: Sample input on leading edge
+      spi_master_arch_cpol: SCK is low when idle
+      spi_master_arch_dbgstop: Keep running
+      spi_master_arch_dord: MSB first
+      spi_master_arch_ibon: In data stream
+      spi_master_arch_runstdby: false
+      spi_master_baud_rate: 50000
+      spi_master_character_size: 8 bits
+      spi_master_dummybyte: 511
+      spi_master_rx_enable: true
+    optional_signals: []
+    variant:
+      specification: TXPO=0, RXPO=2
+      required_signals:
+      - name: SERCOM1/PAD/0
+        pad: PA16
+        label: MOSI
+      - name: SERCOM1/PAD/1
+        pad: PA17
+        label: SCK
+      - name: SERCOM1/PAD/2
+        pad: PA18
+        label: MISO
+    clocks:
+      domain_group:
+        nodes:
+        - name: Core
+          input: Generic clock generator 0
+          external: false
+          external_frequency: 0
+        - name: Slow
+          input: Generic clock generator 3
+          external: false
+          external_frequency: 0
+        configuration:
+          core_gclk_selection: Generic clock generator 0
+          slow_gclk_selection: Generic clock generator 3
   DELAY_0:
     user_label: DELAY_0
     definition: Atmel:SAMD21_Drivers:0.0.1::SAMD21J18A-AU::SysTick::driver_config_definition::Delay::HAL:Driver:Delay
@@ -656,18 +700,37 @@ drivers:
         configuration:
           usb_gclk_selection: Generic clock generator 7
 pads:
-  PA07:
-    name: PA07
-    definition: Atmel:SAMD21_Drivers:0.0.1::SAMD21J18A-AU::pad::PA07
+  BATT_V:
+    name: PA04
+    definition: Atmel:SAMD21_Drivers:0.0.1::SAMD21J18A-AU::pad::PA04
     mode: Analog
-    user_label: PA07
+    user_label: BATT_V
     configuration: null
-  LED:
+  FLASH_MOSI:
+    name: PA16
+    definition: Atmel:SAMD21_Drivers:0.0.1::SAMD21J18A-AU::pad::PA16
+    mode: Digital output
+    user_label: FLASH_MOSI
+    configuration: null
+  FLASH_SCK:
     name: PA17
     definition: Atmel:SAMD21_Drivers:0.0.1::SAMD21J18A-AU::pad::PA17
     mode: Digital output
-    user_label: LED
+    user_label: FLASH_SCK
     configuration: null
+  FLASH_MISO:
+    name: PA18
+    definition: Atmel:SAMD21_Drivers:0.0.1::SAMD21J18A-AU::pad::PA18
+    mode: Digital input
+    user_label: FLASH_MISO
+    configuration: null
+  FLASH_CS:
+    name: PA19
+    definition: Atmel:SAMD21_Drivers:0.0.1::SAMD21J18A-AU::pad::PA19
+    mode: Digital output
+    user_label: FLASH_CS
+    configuration:
+      pad_initial_level: High
   USB_DM:
     name: PA24
     definition: Atmel:SAMD21_Drivers:0.0.1::SAMD21J18A-AU::pad::PA24

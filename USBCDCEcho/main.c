@@ -39,30 +39,75 @@
 #include "atmel_start_pins.h"
 #include <stdio.h>
 
+void read_voltage();
+void test_spi_flash();
+
+const bool USB_ENABLED = false;
+
 int main(void) {
   atmel_start_init();
-  //while (1) {
-  // delay_ms(1000);
-  //  gpio_toggle_pin_level(LED2);
-  //}
-  wait_for_cdc_ready();
-  uint16_t raw_battery_voltage;
+
+  if (USB_ENABLED) {
+    wait_for_cdc_ready();
+  }
 
   adc_sync_enable_channel(&ADC_0, 0);
   while (1) {
     delay_ms(1000);
     gpio_toggle_pin_level(LED2);
+    read_voltage();
+    test_spi_flash();
+  }
+}
 
-    adc_sync_read_channel(&ADC_0, 0, ((uint8_t *)&raw_battery_voltage), 2);
-    adc_sync_read_channel(&ADC_0, 0, ((uint8_t *)&raw_battery_voltage), 2);
+const uint8_t W25_CMD_POWER_ON[] = {
+    0xAB,
+    0x00,
+    0x00,
+    0x00,
+};
+const uint8_t W25_CMD_READ_MANUFACTER_ID[] = {0x90, 0x00, 0x00};
+const uint8_t W25_CMD_READ_JEDEC_ID[] = {0x9F};
 
-    float battery_voltage = (float)raw_battery_voltage;
-    battery_voltage *= 2;    // we divided by 2, so multiply back
-    battery_voltage *= 3.3;  // Multiply by 3.3V, our reference voltage
-    battery_voltage /= 4096; // convert to voltage
-    char buffer[120];
-    sprintf(buffer, "ADC value is %d converted to %.6f also %.6f\n",
-            raw_battery_voltage, battery_voltage, 3.3F);
+void test_spi_flash() {
+  struct io_descriptor *io;
+  spi_m_sync_get_io_descriptor(&SPI_0, &io);
+
+  spi_m_sync_enable(&SPI_0);
+
+  gpio_set_pin_level(FLASH_CS, false);
+  io_write(io, W25_CMD_POWER_ON, sizeof(W25_CMD_POWER_ON));
+  uint8_t result;
+  io_read(io, &result, 1);
+  gpio_set_pin_level(FLASH_CS, true);
+
+  gpio_set_pin_level(FLASH_CS, false);
+  io_write(io, W25_CMD_READ_MANUFACTER_ID, sizeof(W25_CMD_READ_MANUFACTER_ID));
+  uint8_t manufacuter_id[3];
+  io_read(io, manufacuter_id, sizeof(manufacuter_id));
+  gpio_set_pin_level(FLASH_CS, true);
+
+  gpio_set_pin_level(FLASH_CS, false);
+  io_write(io, W25_CMD_READ_JEDEC_ID, sizeof(W25_CMD_READ_JEDEC_ID));
+  uint8_t jedec_id[3];
+  io_read(io, jedec_id, sizeof(jedec_id));
+  gpio_set_pin_level(FLASH_CS, true);
+}
+
+void read_voltage() {
+  uint16_t raw_battery_voltage;
+
+  adc_sync_read_channel(&ADC_0, 0, ((uint8_t *)&raw_battery_voltage), 2);
+  adc_sync_read_channel(&ADC_0, 0, ((uint8_t *)&raw_battery_voltage), 2);
+
+  float battery_voltage = (float)raw_battery_voltage;
+  battery_voltage *= 2;    // we divided by 2, so multiply back
+  battery_voltage *= 3.3;  // Multiply by 3.3V, our reference voltage
+  battery_voltage /= 4096; // convert to voltage
+  char buffer[120];
+  sprintf(buffer, "ADC value is %d converted to %.6f also %.6f\n",
+          raw_battery_voltage, battery_voltage, 3.3F);
+  if (USB_ENABLED) {
     cdcdf_acm_write((uint8_t *)buffer, strlen(buffer));
   }
 }

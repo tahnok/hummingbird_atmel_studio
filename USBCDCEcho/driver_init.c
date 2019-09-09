@@ -15,15 +15,17 @@
 
 #include <hpl_adc_base.h>
 
+struct spi_m_sync_descriptor SPI_0;
+
 struct adc_sync_descriptor ADC_0;
 
 void ADC_0_PORT_init(void)
 {
 
 	// Disable digital pin circuitry
-	gpio_set_pin_direction(PA07, GPIO_DIRECTION_OFF);
+	gpio_set_pin_direction(BATT_V, GPIO_DIRECTION_OFF);
 
-	gpio_set_pin_function(PA07, PINMUX_PA07B_ADC_AIN7);
+	gpio_set_pin_function(BATT_V, PINMUX_PA04B_ADC_AIN4);
 }
 
 void ADC_0_CLOCK_init(void)
@@ -37,6 +39,60 @@ void ADC_0_init(void)
 	ADC_0_CLOCK_init();
 	ADC_0_PORT_init();
 	adc_sync_init(&ADC_0, ADC, (void *)NULL);
+}
+
+void SPI_0_PORT_init(void)
+{
+
+	gpio_set_pin_level(FLASH_MOSI,
+	                   // <y> Initial level
+	                   // <id> pad_initial_level
+	                   // <false"> Low
+	                   // <true"> High
+	                   false);
+
+	// Set pin direction to output
+	gpio_set_pin_direction(FLASH_MOSI, GPIO_DIRECTION_OUT);
+
+	gpio_set_pin_function(FLASH_MOSI, PINMUX_PA16C_SERCOM1_PAD0);
+
+	gpio_set_pin_level(FLASH_SCK,
+	                   // <y> Initial level
+	                   // <id> pad_initial_level
+	                   // <false"> Low
+	                   // <true"> High
+	                   false);
+
+	// Set pin direction to output
+	gpio_set_pin_direction(FLASH_SCK, GPIO_DIRECTION_OUT);
+
+	gpio_set_pin_function(FLASH_SCK, PINMUX_PA17C_SERCOM1_PAD1);
+
+	// Set pin direction to input
+	gpio_set_pin_direction(FLASH_MISO, GPIO_DIRECTION_IN);
+
+	gpio_set_pin_pull_mode(FLASH_MISO,
+	                       // <y> Pull configuration
+	                       // <id> pad_pull_config
+	                       // <GPIO_PULL_OFF"> Off
+	                       // <GPIO_PULL_UP"> Pull-up
+	                       // <GPIO_PULL_DOWN"> Pull-down
+	                       GPIO_PULL_OFF);
+
+	gpio_set_pin_function(FLASH_MISO, PINMUX_PA18C_SERCOM1_PAD2);
+}
+
+void SPI_0_CLOCK_init(void)
+{
+	_pm_enable_bus_clock(PM_BUS_APBC, SERCOM1);
+	_gclk_enable_channel(SERCOM1_GCLK_ID_CORE, CONF_GCLK_SERCOM1_CORE_SRC);
+}
+
+void SPI_0_init(void)
+{
+	SPI_0_CLOCK_init();
+	spi_m_sync_init(&SPI_0, SERCOM1);
+	SPI_0_PORT_init();
 }
 
 void delay_driver_init(void)
@@ -151,19 +207,19 @@ void system_init(void)
 {
 	init_mcu();
 
-	// GPIO on PA17
+	// GPIO on PA19
 
-	gpio_set_pin_level(LED,
+	gpio_set_pin_level(FLASH_CS,
 	                   // <y> Initial level
 	                   // <id> pad_initial_level
 	                   // <false"> Low
 	                   // <true"> High
-	                   false);
+	                   true);
 
 	// Set pin direction to output
-	gpio_set_pin_direction(LED, GPIO_DIRECTION_OUT);
+	gpio_set_pin_direction(FLASH_CS, GPIO_DIRECTION_OUT);
 
-	gpio_set_pin_function(LED, GPIO_PIN_FUNCTION_OFF);
+	gpio_set_pin_function(FLASH_CS, GPIO_PIN_FUNCTION_OFF);
 
 	// GPIO on PA27
 
@@ -180,6 +236,8 @@ void system_init(void)
 	gpio_set_pin_function(LED2, GPIO_PIN_FUNCTION_OFF);
 
 	ADC_0_init();
+
+	SPI_0_init();
 
 	delay_driver_init();
 
