@@ -287,6 +287,50 @@ drivers:
         configuration:
           core_gclk_selection: Generic clock generator 0
           slow_gclk_selection: Generic clock generator 3
+  SPI_1:
+    user_label: SPI_1
+    definition: Atmel:SAMD21_Drivers:0.0.1::SAMD21J18A-AU::SERCOM4::driver_config_definition::SPI.Master::HAL:Driver:SPI.Master.Sync
+    functionality: SPI
+    api: HAL:Driver:SPI_Master_Sync
+    configuration:
+      spi_master_advanced: true
+      spi_master_arch_cpha: Sample input on leading edge
+      spi_master_arch_cpol: SCK is low when idle
+      spi_master_arch_dbgstop: Keep running
+      spi_master_arch_dord: MSB first
+      spi_master_arch_ibon: In data stream
+      spi_master_arch_runstdby: false
+      spi_master_baud_rate: 5000
+      spi_master_character_size: 8 bits
+      spi_master_dummybyte: 0
+      spi_master_rx_enable: true
+    optional_signals: []
+    variant:
+      specification: TXPO=0, RXPO=2
+      required_signals:
+      - name: SERCOM4/PAD/0
+        pad: PB08
+        label: MOSI
+      - name: SERCOM4/PAD/1
+        pad: PB09
+        label: SCK
+      - name: SERCOM4/PAD/2
+        pad: PB10
+        label: MISO
+    clocks:
+      domain_group:
+        nodes:
+        - name: Core
+          input: Generic clock generator 0
+          external: false
+          external_frequency: 0
+        - name: Slow
+          input: Generic clock generator 3
+          external: false
+          external_frequency: 0
+        configuration:
+          core_gclk_selection: Generic clock generator 0
+          slow_gclk_selection: Generic clock generator 3
   DELAY_0:
     user_label: DELAY_0
     definition: Atmel:SAMD21_Drivers:0.0.1::SAMD21J18A-AU::SysTick::driver_config_definition::Delay::HAL:Driver:Delay
@@ -700,12 +744,37 @@ drivers:
         configuration:
           usb_gclk_selection: Generic clock generator 7
 pads:
+  LORA_MOSI:
+    name: PB08
+    definition: Atmel:SAMD21_Drivers:0.0.1::SAMD21J18A-AU::pad::PB08
+    mode: Digital output
+    user_label: LORA_MOSI
+    configuration: null
+  LORA_SCK:
+    name: PB09
+    definition: Atmel:SAMD21_Drivers:0.0.1::SAMD21J18A-AU::pad::PB09
+    mode: Digital output
+    user_label: LORA_SCK
+    configuration: null
   BATT_V:
     name: PA04
     definition: Atmel:SAMD21_Drivers:0.0.1::SAMD21J18A-AU::pad::PA04
     mode: Analog
     user_label: BATT_V
     configuration: null
+  LORA_MISO:
+    name: PB10
+    definition: Atmel:SAMD21_Drivers:0.0.1::SAMD21J18A-AU::pad::PB10
+    mode: Digital input
+    user_label: LORA_MISO
+    configuration: null
+  LORA_CS:
+    name: PB11
+    definition: Atmel:SAMD21_Drivers:0.0.1::SAMD21J18A-AU::pad::PB11
+    mode: Digital output
+    user_label: LORA_CS
+    configuration:
+      pad_initial_level: High
   FLASH_MOSI:
     name: PA16
     definition: Atmel:SAMD21_Drivers:0.0.1::SAMD21J18A-AU::pad::PA16

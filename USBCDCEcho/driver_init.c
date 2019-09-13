@@ -16,6 +16,7 @@
 #include <hpl_adc_base.h>
 
 struct spi_m_sync_descriptor SPI_0;
+struct spi_m_sync_descriptor SPI_1;
 
 struct adc_sync_descriptor ADC_0;
 
@@ -93,6 +94,60 @@ void SPI_0_init(void)
 	SPI_0_CLOCK_init();
 	spi_m_sync_init(&SPI_0, SERCOM1);
 	SPI_0_PORT_init();
+}
+
+void SPI_1_PORT_init(void)
+{
+
+	gpio_set_pin_level(LORA_MOSI,
+	                   // <y> Initial level
+	                   // <id> pad_initial_level
+	                   // <false"> Low
+	                   // <true"> High
+	                   false);
+
+	// Set pin direction to output
+	gpio_set_pin_direction(LORA_MOSI, GPIO_DIRECTION_OUT);
+
+	gpio_set_pin_function(LORA_MOSI, PINMUX_PB08D_SERCOM4_PAD0);
+
+	gpio_set_pin_level(LORA_SCK,
+	                   // <y> Initial level
+	                   // <id> pad_initial_level
+	                   // <false"> Low
+	                   // <true"> High
+	                   false);
+
+	// Set pin direction to output
+	gpio_set_pin_direction(LORA_SCK, GPIO_DIRECTION_OUT);
+
+	gpio_set_pin_function(LORA_SCK, PINMUX_PB09D_SERCOM4_PAD1);
+
+	// Set pin direction to input
+	gpio_set_pin_direction(LORA_MISO, GPIO_DIRECTION_IN);
+
+	gpio_set_pin_pull_mode(LORA_MISO,
+	                       // <y> Pull configuration
+	                       // <id> pad_pull_config
+	                       // <GPIO_PULL_OFF"> Off
+	                       // <GPIO_PULL_UP"> Pull-up
+	                       // <GPIO_PULL_DOWN"> Pull-down
+	                       GPIO_PULL_OFF);
+
+	gpio_set_pin_function(LORA_MISO, PINMUX_PB10D_SERCOM4_PAD2);
+}
+
+void SPI_1_CLOCK_init(void)
+{
+	_pm_enable_bus_clock(PM_BUS_APBC, SERCOM4);
+	_gclk_enable_channel(SERCOM4_GCLK_ID_CORE, CONF_GCLK_SERCOM4_CORE_SRC);
+}
+
+void SPI_1_init(void)
+{
+	SPI_1_CLOCK_init();
+	spi_m_sync_init(&SPI_1, SERCOM4);
+	SPI_1_PORT_init();
 }
 
 void delay_driver_init(void)
@@ -235,9 +290,25 @@ void system_init(void)
 
 	gpio_set_pin_function(LED2, GPIO_PIN_FUNCTION_OFF);
 
+	// GPIO on PB11
+
+	gpio_set_pin_level(LORA_CS,
+	                   // <y> Initial level
+	                   // <id> pad_initial_level
+	                   // <false"> Low
+	                   // <true"> High
+	                   true);
+
+	// Set pin direction to output
+	gpio_set_pin_direction(LORA_CS, GPIO_DIRECTION_OUT);
+
+	gpio_set_pin_function(LORA_CS, GPIO_PIN_FUNCTION_OFF);
+
 	ADC_0_init();
 
 	SPI_0_init();
+
+	SPI_1_init();
 
 	delay_driver_init();
 

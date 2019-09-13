@@ -41,6 +41,7 @@
 
 void read_voltage();
 void test_spi_flash();
+void test_rfm9x();
 
 const bool USB_ENABLED = false;
 
@@ -56,8 +57,43 @@ int main(void) {
     delay_ms(1000);
     gpio_toggle_pin_level(LED2);
     read_voltage();
-    test_spi_flash();
+    //   test_spi_flash();
+    test_rfm9x();
   }
+}
+
+const uint8_t RFM95_REG_OP_MODE[] = {0x01};
+const uint8_t RFM95_REG_VERSION[] = {0x42};
+const uint8_t OP_MODE_SLEEP = 0x0;
+const uint8_t OP_MODE_LORA = 0x80;
+
+void test_rfm9x() {
+  struct io_descriptor *io;
+  spi_m_sync_get_io_descriptor(&SPI_1, &io);
+  spi_m_sync_enable(&SPI_1);
+  
+  /*
+  gpio_set_pin_level(LORA_CS, false);
+  io_write(io, RFM95_REG_VERSION, sizeof(RFM95_REG_VERSION));
+  uint8_t version;
+  io_read(io, &version, 1);
+  gpio_set_pin_level(LORA_CS, true);
+  this is returning 12, which is weird, the datasheet says it should be 11? hoping new version...
+  */
+
+  gpio_set_pin_level(LORA_CS, false);
+  io_write(io, RFM95_REG_OP_MODE, sizeof(RFM95_REG_OP_MODE));
+  uint8_t mode[] = {OP_MODE_SLEEP};
+  io_write(io, mode, 1);
+  gpio_set_pin_level(LORA_CS, true);
+  delay_ms(10);
+  
+  gpio_set_pin_level(LORA_CS, false);
+  io_write(io, RFM95_REG_OP_MODE, sizeof(RFM95_REG_OP_MODE));
+  uint8_t actual_mode;
+  io_read(io, &actual_mode, 1);
+  gpio_set_pin_level(LORA_CS, true);
+  //not going into sleep mode...
 }
 
 const uint8_t W25_CMD_POWER_ON[] = {
