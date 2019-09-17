@@ -9,8 +9,6 @@
 #ifndef RFN9X_H_
 #define RFN9X_H_
 
-#include <stdint.h>
-
 void rfm9x_init();
 
 #endif /* RFN9X_H_ */

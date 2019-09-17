@@ -9,6 +9,7 @@
 #include "atmel_start.h"
 #include "atmel_start_pins.h"
 #include "error.h"
+#include <stdint.h>
 
 static void spi_write_register(struct io_descriptor *const io, uint8_t address,
                                uint8_t value);
