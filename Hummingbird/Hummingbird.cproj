@@ -12,9 +12,9 @@
     <OutputFileName>$(MSBuildProjectName)</OutputFileName>
     <OutputFileExtension>.elf</OutputFileExtension>
     <OutputDirectory>$(MSBuildProjectDirectory)\$(Configuration)</OutputDirectory>
-    <AssemblyName>USBCDCEcho</AssemblyName>
-    <Name>USBCDCEcho</Name>
-    <RootNamespace>USBCDCEcho</RootNamespace>
+    <AssemblyName>Hummingbird</AssemblyName>
+    <Name>Hummingbird</Name>
+    <RootNamespace>Hummingbird</RootNamespace>
     <ToolchainFlavour>Native</ToolchainFlavour>
     <KeepTimersRunning>true</KeepTimersRunning>
     <OverrideVtor>false</OverrideVtor>
@@ -200,7 +200,7 @@
           <SwdClock>4000000</SwdClock>
         </InterfaceProperties>
         <InterfaceName>SWD</InterfaceName>
-        <JlinkConfigFile>C:\Users\Wesley\Documents\Atmel Studio\7.0\USBCDCEcho\USBCDCEcho\jlink.config</JlinkConfigFile>
+        <JlinkConfigFile>C:\Users\Wesley\Documents\Atmel Studio\7.0\USBCDCEcho\Hummingbird\jlink.config</JlinkConfigFile>
       </ToolOptions>
       <ToolType>com.atmel.avrdbg.tool.samice</ToolType>
       <ToolNumber>801012879</ToolNumber>

@@ -39,7 +39,7 @@
  *
  * \acme_license_stop
  *
- * Project: USBCDCEcho
+ * Project: Hummingbird
  * Target:  ATSAMD21G18A 
  *
  **/

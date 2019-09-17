@@ -34,7 +34,7 @@ void rfm9x_init() {
   spi_write_register(io, RFM95_REG_OP_MODE, new_mode);
 
   uint8_t mode = spi_read_register(io, RFM95_REG_OP_MODE);
-  if (mode != 2) {
+  if (mode != new_mode) {
 	  error(RFM95_INIT_FAIL);
   }
 }
