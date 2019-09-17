@@ -39,6 +39,20 @@ void SPI_0_example(void)
 }
 
 /**
+ * Example of using SPI_2 to write "Hello World" using the IO abstraction.
+ */
+static uint8_t example_SPI_2[12] = "Hello World!";
+
+void SPI_2_example(void)
+{
+	struct io_descriptor *io;
+	spi_m_sync_get_io_descriptor(&SPI_2, &io);
+
+	spi_m_sync_enable(&SPI_2);
+	io_write(io, example_SPI_2, 12);
+}
+
+/**
  * Example of using SPI_1 to write "Hello World" using the IO abstraction.
  */
 static uint8_t example_SPI_1[12] = "Hello World!";

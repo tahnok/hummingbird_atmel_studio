@@ -361,6 +361,7 @@
   <armgcc.compiler.optimization.PrepareFunctionsForGarbageCollection>True</armgcc.compiler.optimization.PrepareFunctionsForGarbageCollection>
   <armgcc.compiler.optimization.DebugLevel>Maximum (-g3)</armgcc.compiler.optimization.DebugLevel>
   <armgcc.compiler.warnings.AllWarnings>True</armgcc.compiler.warnings.AllWarnings>
+  <armgcc.compiler.warnings.WarningsAsErrors>True</armgcc.compiler.warnings.WarningsAsErrors>
   <armgcc.linker.general.UseNewlibNano>True</armgcc.linker.general.UseNewlibNano>
   <armgcc.linker.libraries.Libraries>
     <ListValues>
@@ -485,6 +486,12 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="driver_init.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="error.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="error.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="examples\driver_examples.c">
@@ -809,6 +816,12 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="main.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="rfm9x.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="rfm9x.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="usb\class\cdc\device\cdcdf_acm.c">

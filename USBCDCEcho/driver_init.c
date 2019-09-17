@@ -16,6 +16,7 @@
 #include <hpl_adc_base.h>
 
 struct spi_m_sync_descriptor SPI_0;
+struct spi_m_sync_descriptor SPI_2;
 struct spi_m_sync_descriptor SPI_1;
 
 struct adc_sync_descriptor ADC_0;
@@ -94,6 +95,60 @@ void SPI_0_init(void)
 	SPI_0_CLOCK_init();
 	spi_m_sync_init(&SPI_0, SERCOM1);
 	SPI_0_PORT_init();
+}
+
+void SPI_2_PORT_init(void)
+{
+
+	gpio_set_pin_level(BMP388_MOSI,
+	                   // <y> Initial level
+	                   // <id> pad_initial_level
+	                   // <false"> Low
+	                   // <true"> High
+	                   false);
+
+	// Set pin direction to output
+	gpio_set_pin_direction(BMP388_MOSI, GPIO_DIRECTION_OUT);
+
+	gpio_set_pin_function(BMP388_MOSI, PINMUX_PA12C_SERCOM2_PAD0);
+
+	gpio_set_pin_level(BMP388_SCK,
+	                   // <y> Initial level
+	                   // <id> pad_initial_level
+	                   // <false"> Low
+	                   // <true"> High
+	                   false);
+
+	// Set pin direction to output
+	gpio_set_pin_direction(BMP388_SCK, GPIO_DIRECTION_OUT);
+
+	gpio_set_pin_function(BMP388_SCK, PINMUX_PA13C_SERCOM2_PAD1);
+
+	// Set pin direction to input
+	gpio_set_pin_direction(BMP388_MISO, GPIO_DIRECTION_IN);
+
+	gpio_set_pin_pull_mode(BMP388_MISO,
+	                       // <y> Pull configuration
+	                       // <id> pad_pull_config
+	                       // <GPIO_PULL_OFF"> Off
+	                       // <GPIO_PULL_UP"> Pull-up
+	                       // <GPIO_PULL_DOWN"> Pull-down
+	                       GPIO_PULL_OFF);
+
+	gpio_set_pin_function(BMP388_MISO, PINMUX_PA14C_SERCOM2_PAD2);
+}
+
+void SPI_2_CLOCK_init(void)
+{
+	_pm_enable_bus_clock(PM_BUS_APBC, SERCOM2);
+	_gclk_enable_channel(SERCOM2_GCLK_ID_CORE, CONF_GCLK_SERCOM2_CORE_SRC);
+}
+
+void SPI_2_init(void)
+{
+	SPI_2_CLOCK_init();
+	spi_m_sync_init(&SPI_2, SERCOM2);
+	SPI_2_PORT_init();
 }
 
 void SPI_1_PORT_init(void)
@@ -262,6 +317,20 @@ void system_init(void)
 {
 	init_mcu();
 
+	// GPIO on PA15
+
+	gpio_set_pin_level(BMP388_CS,
+	                   // <y> Initial level
+	                   // <id> pad_initial_level
+	                   // <false"> Low
+	                   // <true"> High
+	                   false);
+
+	// Set pin direction to output
+	gpio_set_pin_direction(BMP388_CS, GPIO_DIRECTION_OUT);
+
+	gpio_set_pin_function(BMP388_CS, GPIO_PIN_FUNCTION_OFF);
+
 	// GPIO on PA19
 
 	gpio_set_pin_level(FLASH_CS,
@@ -307,6 +376,8 @@ void system_init(void)
 	ADC_0_init();
 
 	SPI_0_init();
+
+	SPI_2_init();
 
 	SPI_1_init();
 

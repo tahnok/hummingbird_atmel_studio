@@ -242,3 +242,4 @@ uint32_t adc_sync_get_version(void)
 }
 
 //@}
+

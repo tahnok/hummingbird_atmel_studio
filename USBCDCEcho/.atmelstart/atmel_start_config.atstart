@@ -287,6 +287,50 @@ drivers:
         configuration:
           core_gclk_selection: Generic clock generator 0
           slow_gclk_selection: Generic clock generator 3
+  SPI_2:
+    user_label: SPI_2
+    definition: Atmel:SAMD21_Drivers:0.0.1::SAMD21J18A-AU::SERCOM2::driver_config_definition::SPI.Master::HAL:Driver:SPI.Master.Sync
+    functionality: SPI
+    api: HAL:Driver:SPI_Master_Sync
+    configuration:
+      spi_master_advanced: false
+      spi_master_arch_cpha: Sample input on leading edge
+      spi_master_arch_cpol: SCK is low when idle
+      spi_master_arch_dbgstop: Keep running
+      spi_master_arch_dord: MSB first
+      spi_master_arch_ibon: In data stream
+      spi_master_arch_runstdby: false
+      spi_master_baud_rate: 50000
+      spi_master_character_size: 8 bits
+      spi_master_dummybyte: 511
+      spi_master_rx_enable: true
+    optional_signals: []
+    variant:
+      specification: TXPO=0, RXPO=2
+      required_signals:
+      - name: SERCOM2/PAD/0
+        pad: PA12
+        label: MOSI
+      - name: SERCOM2/PAD/1
+        pad: PA13
+        label: SCK
+      - name: SERCOM2/PAD/2
+        pad: PA14
+        label: MISO
+    clocks:
+      domain_group:
+        nodes:
+        - name: Core
+          input: Generic clock generator 0
+          external: false
+          external_frequency: 0
+        - name: Slow
+          input: Generic clock generator 3
+          external: false
+          external_frequency: 0
+        configuration:
+          core_gclk_selection: Generic clock generator 0
+          slow_gclk_selection: Generic clock generator 3
   SPI_1:
     user_label: SPI_1
     definition: Atmel:SAMD21_Drivers:0.0.1::SAMD21J18A-AU::SERCOM4::driver_config_definition::SPI.Master::HAL:Driver:SPI.Master.Sync
@@ -775,6 +819,30 @@ pads:
     user_label: LORA_CS
     configuration:
       pad_initial_level: High
+  BMP388_MOSI:
+    name: PA12
+    definition: Atmel:SAMD21_Drivers:0.0.1::SAMD21J18A-AU::pad::PA12
+    mode: Digital output
+    user_label: BMP388_MOSI
+    configuration: null
+  BMP388_SCK:
+    name: PA13
+    definition: Atmel:SAMD21_Drivers:0.0.1::SAMD21J18A-AU::pad::PA13
+    mode: Digital output
+    user_label: BMP388_SCK
+    configuration: null
+  BMP388_MISO:
+    name: PA14
+    definition: Atmel:SAMD21_Drivers:0.0.1::SAMD21J18A-AU::pad::PA14
+    mode: Digital input
+    user_label: BMP388_MISO
+    configuration: null
+  BMP388_CS:
+    name: PA15
+    definition: Atmel:SAMD21_Drivers:0.0.1::SAMD21J18A-AU::pad::PA15
+    mode: Digital output
+    user_label: BMP388_CS
+    configuration: null
   FLASH_MOSI:
     name: PA16
     definition: Atmel:SAMD21_Drivers:0.0.1::SAMD21J18A-AU::pad::PA16
