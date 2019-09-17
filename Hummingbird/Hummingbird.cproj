@@ -361,7 +361,6 @@
   <armgcc.compiler.optimization.PrepareFunctionsForGarbageCollection>True</armgcc.compiler.optimization.PrepareFunctionsForGarbageCollection>
   <armgcc.compiler.optimization.DebugLevel>Maximum (-g3)</armgcc.compiler.optimization.DebugLevel>
   <armgcc.compiler.warnings.AllWarnings>True</armgcc.compiler.warnings.AllWarnings>
-  <armgcc.compiler.warnings.WarningsAsErrors>True</armgcc.compiler.warnings.WarningsAsErrors>
   <armgcc.linker.general.UseNewlibNano>True</armgcc.linker.general.UseNewlibNano>
   <armgcc.linker.libraries.Libraries>
     <ListValues>
@@ -441,6 +440,12 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="atmel_start_pins.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="bmp388.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="bmp388.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Config\hpl_adc_config.h">

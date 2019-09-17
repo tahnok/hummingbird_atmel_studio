@@ -37,6 +37,7 @@
 
 #include "atmel_start.h"
 #include "atmel_start_pins.h"
+#include "bmp388.h"
 #include "rfm9x.h"
 #include <stdio.h>
 
@@ -60,23 +61,9 @@ int main(void) {
     read_voltage();
     test_spi_flash();
     rfm9x_init();
-
-    //	test_bmp388();
+	bmp388_init();
+	
   }
-}
-
-void test_bmp388() {
-  struct io_descriptor *io;
-  spi_m_sync_get_io_descriptor(&SPI_2, &io);
-  spi_m_sync_enable(&SPI_2);
-
-  gpio_set_pin_level(BMP388_CS, true);
-  gpio_set_pin_level(BMP388_CS, false);
-  uint8_t READ_STATUS[] = {0x80 | 0x00, 0x00};
-  io_write(io, READ_STATUS, 2);
-  uint8_t id;
-  io_read(io, &id, 1);
-  gpio_set_pin_level(BMP388_CS, true);
 }
 
 const uint8_t W25_CMD_POWER_ON[] = {

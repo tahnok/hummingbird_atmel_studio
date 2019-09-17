@@ -10,6 +10,7 @@
 
 typedef enum ERROR_REASON {
     RFM95_INIT_FAIL,
+	BMP388_INIT_FAIL,
 } ERROR_REASON;
 
 void error(ERROR_REASON reason);
