@@ -8,17 +8,22 @@
 #include "atmel_start.h"
 #include "atmel_start_pins.h"
 #include "error.h"
+#include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
 
 static uint8_t bmp388_read_register(uint8_t address);
-static void bmp388_read_registers(uint8_t address, uint8_t *data, uint8_t length);
+static void bmp388_read_registers(uint8_t address, uint8_t *data,
+                                  uint8_t length);
 static void bmp388_write_register(uint8_t address, uint8_t value);
 static void load_calibration();
 
 typedef enum bmp388_mode_t { SLEEP, FORCED, NORMAL } bmp388_mode_t;
 static void enable_and_set_mode(bool pressure, bool temperature,
                                 bmp388_mode_t mode);
+
+static double parse_temperature(uint8_t data_3, uint8_t data_4, uint8_t data_5);
+static double parse_pressure(uint8_t data_0, uint8_t data_1, uint8_t data_2);
 
 static const uint8_t READ_MASK = 0x80; // Set bit 7 high for read
 
@@ -33,66 +38,27 @@ static const uint8_t BMP388_CMD_RESET = 0xB6;
 
 static struct io_descriptor *io;
 
-
 typedef struct calibration_data {
-	double par_t1;
-	double par_t2;
-	double par_t3;
-	
-	double par_p1;
-	double par_p2;
-	double par_p3;
-	double par_p4;
-	double par_p5;
-	double par_p6;
-	double par_p7;
-	double par_p8;
-	double par_p9;
-	double par_p10;
-	double par_p11;
-	
-	double t_lin;
+  double par_t1;
+  double par_t2;
+  double par_t3;
+
+  double par_p1;
+  double par_p2;
+  double par_p3;
+  double par_p4;
+  double par_p5;
+  double par_p6;
+  double par_p7;
+  double par_p8;
+  double par_p9;
+  double par_p10;
+  double par_p11;
+
+  double t_lin;
 } calibration_data;
 
-static calibration_data calibration_datas = { 0 };
-
-
-void bmp388_reset(void) {
-	bmp388_write_register(BMP388_REG_CMD, BMP388_CMD_RESET);
-}
-
-void bmp388_get_reading(void) {
-	enable_and_set_mode(false, false, SLEEP);
-	delay_ms(5);
-	enable_and_set_mode(true, true, FORCED);
-	while(true) {
-		uint8_t status = bmp388_read_register(BMP388_REG_STATUS);
-		if(status & 0x60) { // check bits 6 and 7 are set
-			break;
-		}
-	}
-	uint8_t data[6] = { 0 };
-	bmp388_read_registers(BMP388_REG_DATA, data, sizeof(data));
-	
-	uint32_t lsb = (uint32_t) data[0];
-	uint32_t asb = (uint32_t) data[1] << 8;
-	uint32_t msb = (uint32_t) data[2] << 16;
-	
-	uint32_t pressure = msb | asb | lsb;
-	
-	lsb = (uint32_t) data[3];
-	asb = (uint32_t) data[4] << 8;
-	msb = (uint32_t) data[5] << 16;
-	
-	uint32_t raw_temperature = msb | asb | lsb;
-	
-	double partial_data1 = ((double) raw_temperature) - calibration_datas.par_t1;
-	double partial_data2 = partial_data1 * calibration_datas.par_t2;
-	
-	volatile double final = partial_data2 + (partial_data1 * partial_data1) * calibration_datas.par_t3;
-	
-	  __asm__("BKPT");
-}
+static calibration_data calibration = {0};
 
 void bmp388_init(void) {
   spi_m_sync_get_io_descriptor(&SPI_2, &io);
@@ -100,43 +66,162 @@ void bmp388_init(void) {
 
   bmp388_reset();
 
-  volatile uint8_t result = bmp388_read_register(BMP388_REG_CHIP_ID);
+  uint8_t result = bmp388_read_register(BMP388_REG_CHIP_ID);
   if (result != 0x50) {
     error(BMP388_INIT_FAIL);
   }
-  
+
   load_calibration();
-  
-  while(true) {
-	bmp388_get_reading();
+
+  while (true) {
+    bmp388_get_reading();
   }
 }
 
-static void load_calibration() {
-	uint8_t calibration[21] = { 0 };
-	
-	bmp388_read_registers(BMP388_REG_CALIBRATION, calibration, sizeof(calibration));
-	
-	uint16_t nvm_par_t1 = (calibration[1] << 8) | calibration[0];
-	calibration_datas.par_t1 = ((double) nvm_par_t1) / 0.00390625d; // 1 / 2^ 8
-	uint16_t nvm_par_t2 = (calibration[3] << 8) | calibration[2];
-	calibration_datas.par_t2 = ((double)nvm_par_t2) / 1073741824.0d; // 2 ^ 30
-	uint8_t nvm_par_t3 = calibration[4];
-	calibration_datas.par_t3 = ((double) nvm_par_t3) / 281474976710656.0d; // 2^ 48
-	
-	uint16_t nvm_par_p1 = (calibration[6] << 8) | calibration[5];
-	uint16_t nvm_par_p2 = (calibration[8] << 8) | calibration[7];
-	uint8_t nvm_par_p3 = calibration[9];
-	uint8_t nvm_par_p4 = calibration[10];
-	uint16_t nvm_par_p5 = (calibration[12] << 8) | calibration[11];
-	uint16_t nvm_par_p6 = (calibration[14] << 8) | calibration[13];
-	uint8_t nvm_par_p7 = calibration[15];
-	uint8_t nvm_par_p8 = calibration[16];
-	uint16_t nvm_par_p9 = (calibration[18] << 8) | calibration[17];
-	uint8_t nvm_par_p10 = calibration[19];
-	uint8_t nvm_par_p11 = calibration[20];
+void bmp388_reset(void) {
+  bmp388_write_register(BMP388_REG_CMD, BMP388_CMD_RESET);
 }
 
+void bmp388_get_reading(void) {
+  enable_and_set_mode(false, false, SLEEP);
+  delay_ms(5);
+  enable_and_set_mode(true, true, FORCED);
+  while (true) {
+    uint8_t status = bmp388_read_register(BMP388_REG_STATUS);
+    if (status & 0x60) { // check bits 6 and 7 are set
+      break;
+    }
+  }
+  uint8_t raw_reading[6] = {0};
+  bmp388_read_registers(BMP388_REG_DATA, raw_reading, sizeof(raw_reading));
+
+  volatile double temperature =
+      parse_temperature(raw_reading[3], raw_reading[4], raw_reading[5]);
+  volatile double pressure =
+      parse_pressure(raw_reading[0], raw_reading[1], raw_reading[2]);
+
+  __asm__("BKPT");
+}
+
+/*
+Take the data from the 3 temperature registers and converts them, corrects them
+and returns the temperature
+
+ALSO, set calibration.t_lin, since temperature is needed for pressure
+
+See Section 9.2 in the BMP388 Datasheet
+*/
+double parse_temperature(uint8_t data_3, uint8_t data_4, uint8_t data_5) {
+  uint32_t xlsb = (uint32_t)data_3;
+  uint32_t lsb = (uint32_t)data_4 << 8;
+  uint32_t msb = (uint32_t)data_5 << 16;
+
+  uint32_t raw_temperature = msb | lsb | xlsb;
+
+  double partial_data1 = ((double)raw_temperature) - calibration.par_t1;
+  double partial_data2 = partial_data1 * calibration.par_t2;
+
+  volatile double temperature =
+      partial_data2 + (partial_data1 * partial_data1) * calibration.par_t3;
+
+  calibration.t_lin = temperature;
+
+  return temperature;
+}
+
+static double parse_pressure(uint8_t data_0, uint8_t data_1, uint8_t data_2) {
+  uint32_t xlsb = (uint32_t)data_0;
+  uint32_t lsb = (uint32_t)data_1 << 8;
+  uint32_t msb = (uint32_t)data_2 << 16;
+
+  uint32_t raw_pressure = msb | lsb | xlsb;
+  
+  double partial_data1;
+  double partial_data2;
+  double partial_data3;
+  double partial_data4;
+  
+  partial_data1 = calibration.par_p6 * calibration.t_lin;
+  partial_data2 = calibration.par_p7 * pow(calibration.t_lin, 2.0d);
+  partial_data3 = calibration.par_p8 * pow(calibration.t_lin, 3.0d);
+  
+  double partial_out1 = calibration.par_p5 + partial_data1 + partial_data2 + partial_data3;
+  
+  partial_data1 = calibration.par_p2 * calibration.t_lin;
+  partial_data2 = calibration.par_p3 * pow(calibration.t_lin, 2.0d);
+  partial_data3 = calibration.par_p4 * pow(calibration.t_lin, 3.0d);
+  
+  double partial_out2 = ((double) raw_pressure) * (calibration.par_p1 + partial_data1 + partial_data2 + partial_data3);
+  
+  partial_data1 = pow(((double) raw_pressure), 2.0d);
+  partial_data2 = calibration.par_p9 + calibration.par_p10 * calibration.t_lin;
+  partial_data3 = partial_data1 * partial_data2;
+  partial_data4 = partial_data3 + pow(((double) raw_pressure), 3.0d) * calibration.par_p11;
+  
+  return partial_out1 + partial_out2 + partial_data4;
+}
+
+/*
+Read calibration registers and calculate calibration parameters
+
+See BMP388 datasheet, section 9.1 for formulas, section 3.11.1 for register
+layouts
+*/
+static void load_calibration() {
+  uint8_t raw_calibration[21] = {0};
+
+  bmp388_read_registers(BMP388_REG_CALIBRATION, raw_calibration,
+                        sizeof(raw_calibration));
+
+  uint16_t nvm_par_t1 = (raw_calibration[1] << 8) | raw_calibration[0];
+  calibration.par_t1 = ((double)nvm_par_t1) / 0.00390625d; // 1 / 2^ 8
+
+  uint16_t nvm_par_t2 = (raw_calibration[3] << 8) | raw_calibration[2];
+  calibration.par_t2 = ((double)nvm_par_t2) / 1073741824.0d; // 2 ^ 30
+
+  uint8_t nvm_par_t3 = raw_calibration[4];
+  calibration.par_t3 = ((double)nvm_par_t3) / 281474976710656.0d; // 2^ 48
+
+  uint16_t nvm_par_p1 = (raw_calibration[6] << 8) | raw_calibration[5];
+  calibration.par_p1 =
+      ((double)(nvm_par_p1 - 16384)) / 1048576.0d; // (nvm_par_p1 - 2^14) / 2^20
+
+  uint16_t nvm_par_p2 = (raw_calibration[8] << 8) | raw_calibration[7];
+  calibration.par_p2 = ((double)(nvm_par_p2 - 16384)) /
+                       536870912.0d; // (nvm_par_p2 - 2^14) / 2^29
+
+  uint8_t nvm_par_p3 = raw_calibration[9];
+  calibration.par_p3 =
+      ((double)nvm_par_p3) / 4294967296.0d; // nvm_par_p3 / 2^32
+
+  uint8_t nvm_par_p4 = raw_calibration[10];
+  calibration.par_p4 =
+      ((double)nvm_par_p4) / 137438953472.0d; // nvm_par_p4 / 2^37
+
+  uint16_t nvm_par_p5 = (raw_calibration[12] << 8) | raw_calibration[11];
+  calibration.par_p5 = ((double)nvm_par_p5) / 0.125d; // nvm_par_p5 / 2^-3
+
+  uint16_t nvm_par_p6 = (raw_calibration[14] << 8) | raw_calibration[13];
+  calibration.par_p6 = ((double)nvm_par_p6) / 64.0d; // nvm_par_p6 / 2^6
+
+  uint8_t nvm_par_p7 = raw_calibration[15];
+  calibration.par_p7 = ((double)nvm_par_p7) / 256.0d; // nvm_par_p7 / 2^8
+
+  uint8_t nvm_par_p8 = raw_calibration[16];
+  calibration.par_p8 = ((double)nvm_par_p8) / 32768.0d; // nvm_par_p8 / 2^15
+
+  uint16_t nvm_par_p9 = (raw_calibration[18] << 8) | raw_calibration[17];
+  calibration.par_p9 =
+      ((double)nvm_par_p9) / 281474976710656.0d; // nvm_par_p9 / 2^48
+
+  uint8_t nvm_par_p10 = raw_calibration[19];
+  calibration.par_p10 =
+      ((double)nvm_par_p10) / 281474976710656.0d; // nvm_par_p10 / 2^48
+
+  uint8_t nvm_par_p11 = raw_calibration[20];
+  calibration.par_p11 =
+      ((double)nvm_par_p11) / 36893488147419103232.0d; // nvm_par_p11 / 2^65
+}
 
 static void enable_and_set_mode(bool pressure, bool temperature,
                                 bmp388_mode_t mode) {
@@ -145,12 +230,12 @@ static void enable_and_set_mode(bool pressure, bool temperature,
   if (pressure) {
     value |= (1 << 0); // set bit 0
   } else {
-	  //clear bit
+    // TODO clear bit
   }
   if (temperature) {
     value |= (1 << 1); // set bit 1
   } else {
-	  //clear bit
+    // TODO clear bit
   }
 
   switch (mode) { // set bits 4 and 5
@@ -181,8 +266,9 @@ static uint8_t bmp388_read_register(uint8_t address) {
   return result;
 }
 
-static void bmp388_read_registers(uint8_t address, uint8_t *data, uint8_t length) {
-	address = address | READ_MASK;
+static void bmp388_read_registers(uint8_t address, uint8_t *data,
+                                  uint8_t length) {
+  address = address | READ_MASK;
   uint8_t address_and_dummy_byte[2];
   address_and_dummy_byte[0] = address;
   address_and_dummy_byte[1] = 0;
