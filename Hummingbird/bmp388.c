@@ -161,6 +161,10 @@ static double parse_pressure(uint8_t data_0, uint8_t data_1, uint8_t data_2) {
   return partial_out1 + partial_out2 + partial_data4;
 }
 
+inline static uint16_t byte_concat(uint8_t msb, uint8_t lsb) {
+  return (((uint16_t) msb) << 8) | ((uint16_t) lsb);
+}
+
 /*
 Read calibration registers and calculate calibration parameters
 
@@ -173,52 +177,53 @@ static void load_calibration() {
   bmp388_read_registers(BMP388_REG_CALIBRATION, raw_calibration,
                         sizeof(raw_calibration));
 
-  uint16_t nvm_par_t1 = (raw_calibration[1] << 8) | raw_calibration[0];
-  calibration.par_t1 = ((double)nvm_par_t1) / 0.00390625d; // 1 / 2^ 8
+  uint16_t nvm_par_t1 = byte_concat(raw_calibration[1], raw_calibration[0]);
+  calibration.par_t1 = ((double)nvm_par_t1) / 0.00390625d; // 1 / 2^-8
 
-  uint16_t nvm_par_t2 = (raw_calibration[3] << 8) | raw_calibration[2];
+  uint16_t nvm_par_t2 = byte_concat(raw_calibration[3], raw_calibration[2]);
   calibration.par_t2 = ((double)nvm_par_t2) / 1073741824.0d; // 2 ^ 30
 
-  uint8_t nvm_par_t3 = raw_calibration[4];
+  int8_t nvm_par_t3 = (int8_t) raw_calibration[4];
   calibration.par_t3 = ((double)nvm_par_t3) / 281474976710656.0d; // 2^ 48
 
-  uint16_t nvm_par_p1 = (raw_calibration[6] << 8) | raw_calibration[5];
+
+  int16_t nvm_par_p1 = (int16_t) byte_concat(raw_calibration[6], raw_calibration[5]);
   calibration.par_p1 =
       ((double)(nvm_par_p1 - 16384)) / 1048576.0d; // (nvm_par_p1 - 2^14) / 2^20
 
-  uint16_t nvm_par_p2 = (raw_calibration[8] << 8) | raw_calibration[7];
+  int16_t nvm_par_p2 = (int16_t) byte_concat(raw_calibration[8], raw_calibration[7]);
   calibration.par_p2 = ((double)(nvm_par_p2 - 16384)) /
                        536870912.0d; // (nvm_par_p2 - 2^14) / 2^29
 
-  uint8_t nvm_par_p3 = raw_calibration[9];
+  int8_t nvm_par_p3 = (int8_t) raw_calibration[9];
   calibration.par_p3 =
       ((double)nvm_par_p3) / 4294967296.0d; // nvm_par_p3 / 2^32
 
-  uint8_t nvm_par_p4 = raw_calibration[10];
+  int8_t nvm_par_p4 = (int8_t) raw_calibration[10];
   calibration.par_p4 =
       ((double)nvm_par_p4) / 137438953472.0d; // nvm_par_p4 / 2^37
 
-  uint16_t nvm_par_p5 = (raw_calibration[12] << 8) | raw_calibration[11];
+  uint16_t nvm_par_p5 = byte_concat(raw_calibration[12], raw_calibration[11]);
   calibration.par_p5 = ((double)nvm_par_p5) / 0.125d; // nvm_par_p5 / 2^-3
 
-  uint16_t nvm_par_p6 = (raw_calibration[14] << 8) | raw_calibration[13];
+  uint16_t nvm_par_p6 = byte_concat(raw_calibration[14], raw_calibration[13]);
   calibration.par_p6 = ((double)nvm_par_p6) / 64.0d; // nvm_par_p6 / 2^6
 
-  uint8_t nvm_par_p7 = raw_calibration[15];
+  int8_t nvm_par_p7 = (int8_t) raw_calibration[15];
   calibration.par_p7 = ((double)nvm_par_p7) / 256.0d; // nvm_par_p7 / 2^8
 
-  uint8_t nvm_par_p8 = raw_calibration[16];
+  int8_t nvm_par_p8 = (int8_t) raw_calibration[16];
   calibration.par_p8 = ((double)nvm_par_p8) / 32768.0d; // nvm_par_p8 / 2^15
 
-  uint16_t nvm_par_p9 = (raw_calibration[18] << 8) | raw_calibration[17];
+  int16_t nvm_par_p9 = (int16_t) byte_concat(raw_calibration[18], raw_calibration[17]);
   calibration.par_p9 =
       ((double)nvm_par_p9) / 281474976710656.0d; // nvm_par_p9 / 2^48
 
-  uint8_t nvm_par_p10 = raw_calibration[19];
+  int8_t nvm_par_p10 = (int8_t) raw_calibration[19];
   calibration.par_p10 =
       ((double)nvm_par_p10) / 281474976710656.0d; // nvm_par_p10 / 2^48
 
-  uint8_t nvm_par_p11 = raw_calibration[20];
+  int8_t nvm_par_p11 = (int8_t) raw_calibration[20];
   calibration.par_p11 =
       ((double)nvm_par_p11) / 36893488147419103232.0d; // nvm_par_p11 / 2^65
 }
