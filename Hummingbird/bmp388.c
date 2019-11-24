@@ -8,6 +8,7 @@
 #include "atmel_start.h"
 #include "atmel_start_pins.h"
 #include "error.h"
+#include "bmp388.h"
 #include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -72,17 +73,13 @@ void bmp388_init(void) {
   }
 
   load_calibration();
-
-  while (true) {
-    bmp388_get_reading();
-  }
 }
 
 void bmp388_reset(void) {
   bmp388_write_register(BMP388_REG_CMD, BMP388_CMD_RESET);
 }
 
-void bmp388_get_reading(void) {
+void bmp388_get_reading(bmp_reading* reading) {
   enable_and_set_mode(false, false, SLEEP);
   delay_ms(5);
   enable_and_set_mode(true, true, FORCED);
@@ -100,7 +97,8 @@ void bmp388_get_reading(void) {
   volatile double pressure =
       parse_pressure(raw_reading[0], raw_reading[1], raw_reading[2]);
 
-  __asm__("BKPT");
+  reading->temperature = temperature;
+  reading->pressure = pressure;
 }
 
 /*

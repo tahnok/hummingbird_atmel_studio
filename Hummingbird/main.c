@@ -55,14 +55,15 @@ int main(void) {
   }
 
   adc_sync_enable_channel(&ADC_0, 0);
+  bmp388_init();
+
+  bmp_reading reading = {0};
+
   while (1) {
     delay_ms(1000);
     gpio_toggle_pin_level(LED2);
-    read_voltage();
-    test_spi_flash();
-    rfm9x_init();
-	bmp388_init();
-	
+    bmp388_get_reading(&reading);
+    __asm__("BKPT");
   }
 }
 
