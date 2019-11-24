@@ -829,6 +829,12 @@
     <Compile Include="rfm9x.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="spi_flash.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="spi_flash.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="usb\class\cdc\device\cdcdf_acm.c">
       <SubType>compile</SubType>
     </Compile>

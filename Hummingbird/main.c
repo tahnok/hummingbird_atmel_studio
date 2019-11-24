@@ -39,10 +39,10 @@
 #include "atmel_start_pins.h"
 #include "bmp388.h"
 #include "rfm9x.h"
+#include "spi_flash.h"
 #include <stdio.h>
 
 void read_voltage();
-void test_spi_flash();
 void test_bmp388();
 
 const bool USB_ENABLED = false;
@@ -55,7 +55,10 @@ int main(void) {
   }
 
   adc_sync_enable_channel(&ADC_0, 0);
+
+  rfm9x_init();
   bmp388_init();
+  spi_flash_init();
 
   bmp_reading reading = {0};
 
@@ -65,40 +68,6 @@ int main(void) {
     bmp388_get_reading(&reading);
     __asm__("BKPT");
   }
-}
-
-const uint8_t W25_CMD_POWER_ON[] = {
-    0xAB,
-    0x00,
-    0x00,
-    0x00,
-};
-const uint8_t W25_CMD_READ_MANUFACTER_ID[] = {0x90, 0x00, 0x00};
-const uint8_t W25_CMD_READ_JEDEC_ID[] = {0x9F};
-
-void test_spi_flash() {
-  struct io_descriptor *io;
-  spi_m_sync_get_io_descriptor(&SPI_0, &io);
-
-  spi_m_sync_enable(&SPI_0);
-
-  gpio_set_pin_level(FLASH_CS, false);
-  io_write(io, W25_CMD_POWER_ON, sizeof(W25_CMD_POWER_ON));
-  uint8_t result;
-  io_read(io, &result, 1);
-  gpio_set_pin_level(FLASH_CS, true);
-
-  gpio_set_pin_level(FLASH_CS, false);
-  io_write(io, W25_CMD_READ_MANUFACTER_ID, sizeof(W25_CMD_READ_MANUFACTER_ID));
-  uint8_t manufacuter_id[3];
-  io_read(io, manufacuter_id, sizeof(manufacuter_id));
-  gpio_set_pin_level(FLASH_CS, true);
-
-  gpio_set_pin_level(FLASH_CS, false);
-  io_write(io, W25_CMD_READ_JEDEC_ID, sizeof(W25_CMD_READ_JEDEC_ID));
-  uint8_t jedec_id[3];
-  io_read(io, jedec_id, sizeof(jedec_id));
-  gpio_set_pin_level(FLASH_CS, true);
 }
 
 void read_voltage() {
