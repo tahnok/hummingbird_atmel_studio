@@ -4,10 +4,10 @@ versions:
   api: '1.0'
   backend: 1.6.148
   commit: 605f106ab95776472e3febf2fac2471441fb1816
-  content: 1.0.1600
+  content: 1.0.1635
   content_pack_name: acme-packs-all
   format: '2'
-  frontend: 1.6.1881
+  frontend: 1.6.1884
 board:
   identifier: SAMD21XplainedPro
   device: SAMD21J18A-AU
@@ -805,6 +805,19 @@ pads:
     definition: Atmel:SAMD21_Drivers:0.0.1::SAMD21J18A-AU::pad::PA04
     mode: Analog
     user_label: BATT_V
+    configuration: null
+  LORA_RESET:
+    name: PA06
+    definition: Atmel:SAMD21_Drivers:0.0.1::SAMD21J18A-AU::pad::PA06
+    mode: Digital output
+    user_label: LORA_RESET
+    configuration:
+      pad_initial_level: High
+  LORA_INT:
+    name: PA07
+    definition: Atmel:SAMD21_Drivers:0.0.1::SAMD21J18A-AU::pad::PA07
+    mode: Digital input
+    user_label: LORA_INT
     configuration: null
   LORA_MISO:
     name: PB10

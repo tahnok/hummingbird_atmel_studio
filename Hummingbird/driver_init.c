@@ -317,6 +317,35 @@ void system_init(void)
 {
 	init_mcu();
 
+	// GPIO on PA06
+
+	gpio_set_pin_level(LORA_RESET,
+	                   // <y> Initial level
+	                   // <id> pad_initial_level
+	                   // <false"> Low
+	                   // <true"> High
+	                   true);
+
+	// Set pin direction to output
+	gpio_set_pin_direction(LORA_RESET, GPIO_DIRECTION_OUT);
+
+	gpio_set_pin_function(LORA_RESET, GPIO_PIN_FUNCTION_OFF);
+
+	// GPIO on PA07
+
+	// Set pin direction to input
+	gpio_set_pin_direction(LORA_INT, GPIO_DIRECTION_IN);
+
+	gpio_set_pin_pull_mode(LORA_INT,
+	                       // <y> Pull configuration
+	                       // <id> pad_pull_config
+	                       // <GPIO_PULL_OFF"> Off
+	                       // <GPIO_PULL_UP"> Pull-up
+	                       // <GPIO_PULL_DOWN"> Pull-down
+	                       GPIO_PULL_OFF);
+
+	gpio_set_pin_function(LORA_INT, GPIO_PIN_FUNCTION_OFF);
+
 	// GPIO on PA15
 
 	gpio_set_pin_level(BMP388_CS,
