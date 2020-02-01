@@ -109,7 +109,7 @@ ALSO, set calibration.t_lin, since temperature is needed for pressure
 
 See Section 9.2 in the BMP388 Datasheet
 */
-double parse_temperature(uint8_t data_3, uint8_t data_4, uint8_t data_5) {
+static double parse_temperature(uint8_t data_3, uint8_t data_4, uint8_t data_5) {
   uint32_t xlsb = (uint32_t)data_3;
   uint32_t lsb = (uint32_t)data_4 << 8;
   uint32_t msb = (uint32_t)data_5 << 16;

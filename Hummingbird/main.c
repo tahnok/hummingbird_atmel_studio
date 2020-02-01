@@ -47,6 +47,14 @@ void test_bmp388();
 
 const bool USB_ENABLED = false;
 
+typedef struct Datapoint {
+  float temperature;
+  int32_t pressure;
+  float battery_voltage;
+  uint32_t packet_number;
+  uint32_t flight_number;
+} Datapoint;
+
 int main(void) {
   atmel_start_init();
 
@@ -61,12 +69,34 @@ int main(void) {
   spi_flash_init();
 
   bmp_reading reading = {0};
+  Datapoint datapoint = {0};
+  uint32_t packet_number = 0;
 
   while (1) {
-    delay_ms(1000);
+    delay_ms(5000);
     gpio_toggle_pin_level(LED2);
     bmp388_get_reading(&reading);
-    __asm__("BKPT");
+    // datapoint = {32.0, 424242, 4.2, packet_number, 420};
+    datapoint.battery_voltage = 4.2;
+	datapoint.temperature = 12.0;
+	datapoint.pressure = 424242;
+	datapoint.packet_number = packet_number;
+	datapoint.flight_number = 32;
+
+    /*
+        (*datapoint)->battery_voltage = 4.2;
+        (*datapoint)->temperature = 32.0;
+        (*datapoint)->pressure = 42424242;
+        (*datapoint)->packet_number = packet_number;
+        (*datapoint)->flight_number = 42; */
+
+    uint8_t buf[sizeof(Datapoint)] = {0};
+
+    memcpy(buf, &datapoint, sizeof(Datapoint));
+
+    rfm9x_send(buf, sizeof(buf));
+    packet_number++;
+    // __asm__("BKPT");
   }
 }
 
