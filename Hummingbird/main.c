@@ -42,8 +42,7 @@
 #include "spi_flash.h"
 #include <stdio.h>
 
-void read_voltage();
-void test_bmp388();
+uint16_t read_voltage();
 
 const bool USB_ENABLED = false;
 
@@ -76,19 +75,12 @@ int main(void) {
     delay_ms(5000);
     gpio_toggle_pin_level(LED2);
     bmp388_get_reading(&reading);
-    // datapoint = {32.0, 424242, 4.2, packet_number, 420};
-    datapoint.battery_voltage = 4.2;
-	datapoint.temperature = 12.0;
-	datapoint.pressure = 424242;
-	datapoint.packet_number = packet_number;
-	datapoint.flight_number = 32;
 
-    /*
-        (*datapoint)->battery_voltage = 4.2;
-        (*datapoint)->temperature = 32.0;
-        (*datapoint)->pressure = 42424242;
-        (*datapoint)->packet_number = packet_number;
-        (*datapoint)->flight_number = 42; */
+    datapoint.battery_voltage = read_voltage();
+    datapoint.temperature = (float)reading.temperature;
+    datapoint.pressure = (int32_t)reading.pressure;
+    datapoint.packet_number = packet_number;
+    datapoint.flight_number = 42;
 
     uint8_t buf[sizeof(Datapoint)] = {0};
 
@@ -100,7 +92,7 @@ int main(void) {
   }
 }
 
-void read_voltage() {
+uint16_t read_voltage() {
   uint16_t raw_battery_voltage;
 
   adc_sync_read_channel(&ADC_0, 0, ((uint8_t *)&raw_battery_voltage), 2);
@@ -110,11 +102,12 @@ void read_voltage() {
   battery_voltage *= 2;    // we divided by 2, so multiply back
   battery_voltage *= 3.3;  // Multiply by 3.3V, our reference voltage
   battery_voltage /= 4096; // convert to voltage
-  char buffer[120];
-  sprintf(buffer, "ADC value is %d converted to %.6f also %.6f\n",
-          raw_battery_voltage, battery_voltage, 3.3F);
+  return battery_voltage;
+
+  /*
   if (USB_ENABLED) {
     cdcdf_acm_write((uint8_t *)buffer, strlen(buffer));
   }
+  */
 }
 
