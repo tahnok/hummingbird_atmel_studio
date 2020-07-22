@@ -481,6 +481,12 @@
     <Compile Include="Config\usbd_config.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="crc.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="crc.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="Device_Startup\startup_samd21.c">
       <SubType>compile</SubType>
     </Compile>

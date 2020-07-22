@@ -38,21 +38,29 @@
 #include "atmel_start.h"
 #include "atmel_start_pins.h"
 #include "bmp388.h"
+#include "crc.h"
 #include "rfm9x.h"
 #include "spi_flash.h"
 #include <stdio.h>
 
-uint16_t read_voltage();
+float read_voltage();
 
 const bool USB_ENABLED = false;
 
 typedef struct Datapoint {
-  float temperature;
-  int32_t pressure;
-  float battery_voltage;
-  uint32_t packet_number;
-  uint32_t flight_number;
+  double temperature; // 8 bytes
+  double pressure; //8 bytes 
+  float battery_voltage; // 4 bytes
+  uint32_t packet_number; // 4 bytes
+  uint32_t flight_number; // 4 bytes
+  uint8_t device_id; // 1 bytes
+  uint8_t version; // 1 bytes
+  crc_t crc8; // 1 bytes
 } Datapoint;
+
+const uint8_t VERSION = 1;
+const uint8_t DEVICE_ID	= 1;
+const uint8_t DATAPOINT_TO_CRC = 30;
 
 int main(void) {
   atmel_start_init();
@@ -69,6 +77,8 @@ int main(void) {
 
   bmp_reading reading = {0};
   Datapoint datapoint = {0};
+  datapoint.device_id = DEVICE_ID;
+  datapoint.version	= VERSION;
   uint32_t packet_number = 0;
 
   while (1) {
@@ -77,22 +87,25 @@ int main(void) {
     bmp388_get_reading(&reading);
 
     datapoint.battery_voltage = read_voltage();
-    datapoint.temperature = (float)reading.temperature;
-    datapoint.pressure = (int32_t)reading.pressure;
+    datapoint.temperature = reading.temperature;
+    datapoint.pressure = reading.pressure;
     datapoint.packet_number = packet_number;
     datapoint.flight_number = 42;
 
-    uint8_t buf[sizeof(Datapoint)] = {0};
-
-    memcpy(buf, &datapoint, sizeof(Datapoint));
-
-    rfm9x_send(buf, sizeof(buf));
+	uint8_t* raw = (uint8_t*) &datapoint;
+	
+	volatile crc_t crc = crc_init();
+	crc = crc_update(crc, raw, DATAPOINT_TO_CRC);
+	crc = crc_finalize(crc);
+	datapoint.crc8 = crc;
+	rfm9x_send(raw, sizeof(Datapoint));
     packet_number++;
     // __asm__("BKPT");
   }
 }
 
-uint16_t read_voltage() {
+
+float read_voltage() {
   uint16_t raw_battery_voltage;
 
   adc_sync_read_channel(&ADC_0, 0, ((uint8_t *)&raw_battery_voltage), 2);
